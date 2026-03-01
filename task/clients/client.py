@@ -1,4 +1,4 @@
-from aidial_client import Dial, AsyncDial  # optional, kept for compatibility
+from aidial_client import Dial, AsyncDial
 
 from task.clients.base import BaseClient
 from task.models.message import Message

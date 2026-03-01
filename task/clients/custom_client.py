@@ -87,9 +87,6 @@ class DialClient(BaseClient):
                             contents.append(content_piece)
                     if done:
                         break
-        print()  # newline after stream
+        print()
         assembled = "".join(contents)
-        # print full assembled response for visibility
-        print("\nFull assistant response:", assembled)
         return Message(Role.AI, assembled)
-
