@@ -14,4 +14,3 @@ class Conversation:
 
     def get_messages(self) -> list[Message]:
         return self.messages
-    

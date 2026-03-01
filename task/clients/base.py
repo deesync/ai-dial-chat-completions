@@ -11,7 +11,7 @@ class BaseClient(ABC):
         if not api_key or api_key.strip() == "":
             raise ValueError("API key cannot be null or empty")
         self._api_key = api_key
-        self._deployment_name= deployment_name
+        self._deployment_name = deployment_name
 
     @abstractmethod
     def get_completion(self, messages: list[Message]) -> Message:
