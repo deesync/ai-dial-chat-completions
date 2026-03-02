@@ -1,6 +1,7 @@
 import json
 import aiohttp
 import requests
+from typing import Optional
 
 from task.clients.base import BaseClient
 from task.constants import DIAL_ENDPOINT
@@ -72,16 +73,7 @@ class DialClient(BaseClient):
                         if payload == "[DONE]":
                             done = True
                             break
-                        try:
-                            obj = json.loads(payload)
-                        except json.JSONDecodeError:
-                            continue
-                        # extract delta/content
-                        content_piece = None
-                        try:
-                            content_piece = obj["choices"][0]["delta"].get("content")
-                        except Exception:
-                            content_piece = obj.get("delta", {}).get("content")
+                        content_piece = self._get_content_snippet(payload)
                         if content_piece:
                             print(content_piece, end="", flush=True)
                             contents.append(content_piece)
@@ -90,3 +82,35 @@ class DialClient(BaseClient):
         print()
         assembled = "".join(contents)
         return Message(Role.AI, assembled)
+
+    def _get_content_snippet(self, payload: str) -> Optional[str]:
+        """
+        Parse a streaming payload (JSON string) and return the content snippet if present.
+        Handles typical DIAL streaming chunk shapes: choices[0].delta.content
+        Falls back to choices[0].message.content when applicable.
+        """
+        try:
+            obj = json.loads(payload)
+        except json.JSONDecodeError:
+            return None
+
+        choices = obj.get("choices")
+        if not choices or not isinstance(choices, list):
+            return None
+
+        choice = choices[0] if choices else {}
+        # Prefer delta.content (streaming chunks)
+        delta = choice.get("delta", {}) if isinstance(choice, dict) else {}
+        if isinstance(delta, dict):
+            content = delta.get("content")
+            if content:
+                return content
+
+        # Fallback to message.content (regular non-stream responses inside chunks)
+        message = choice.get("message", {}) if isinstance(choice, dict) else {}
+        if isinstance(message, dict):
+            content = message.get("content")
+            if content:
+                return content
+
+        return None
