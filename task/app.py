@@ -53,11 +53,11 @@ async def start(stream: bool) -> None:
 			print("Error:", e)
 			continue
 
-		# # print and store assistant message
-		# print(f"\nAssistant: {assistant_msg.content}")
-		# conv.add_message(assistant_msg)
+		# print and store assistant message
+		print(f"\nAssistant: {assistant_msg.content}")
+		conv.add_message(assistant_msg)
 
 
 asyncio.run(
-	start(True)
+	start(False)
 )
